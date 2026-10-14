@@ -1,1 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="index,follow">
+<title>StudyMatch AI | Tutor comparison agent</title>
+<meta name="description" content="Subject, level and trial questions — so tutoring fits the learner.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070A0F;--panel:rgba(18,24,36,.88);--panel2:#151C2A;--border:rgba(255,255,255,.08);
+  --text:#F1F5F9;--muted:#94A3B8;--accent:#F472B6;--accent2:#DB2777;--phone-tint:#FCE7F3;
+  --radius:20px;--shadow:0 24px 80px rgba(0,0,0,.55);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:88px}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.container{width:min(1140px,92%);margin:0 auto}
+header{position:sticky;top:0;z-index:100;backdrop-filter:blur(18px);background:rgba(7,10,15,.82);border-bottom:1px solid var(--border)}
+nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;gap:16px}
+.logo{font-weight:900;font-size:1.15rem;letter-spacing:-.03em}
+.logo span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:6px;flex-wrap:wrap}
+.nav-links a{color:var(--muted);font-size:.84rem;font-weight:600;padding:8px 11px;border-radius:999px}
+.nav-links a:hover{color:var(--text);background:rgba(255,255,255,.05)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:14px;padding:13px 20px;font-weight:800;cursor:pointer;transition:.2s;font-size:.94rem;font-family:inherit}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.05)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0B1220;box-shadow:0 12px 40px color-mix(in srgb,var(--accent) 35%,transparent)}
+.btn-secondary{background:var(--panel2);color:var(--text);border:1px solid var(--border)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-sm{padding:9px 14px;font-size:.84rem;border-radius:12px}
+.hero-section{padding:100px 0 70px;position:relative;overflow:hidden;min-height:640px}
+.hero-section::before,.hero-section::after{content:"";position:absolute;border-radius:50%;z-index:0;animation:float 8s ease-in-out infinite;pointer-events:none}
+.hero-section::before{width:420px;height:420px;background:color-mix(in srgb,var(--accent) 18%,transparent);top:40px;right:-120px}
+.hero-section::after{width:280px;height:280px;background:color-mix(in srgb,var(--accent2) 12%,transparent);bottom:-80px;left:-80px;animation-delay:-3s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;position:relative;z-index:1}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:16px}
+.eyebrow::before{content:"";width:22px;height:3px;border-radius:99px;background:var(--accent)}
+.hero h1{font-size:clamp(2.05rem,4.5vw,3.2rem);line-height:1.08;letter-spacing:-.04em;margin-bottom:16px;font-weight:900}
+.hero h1 span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero .lead{color:var(--muted);font-size:1.08rem;max-width:52ch;margin-bottom:26px}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+.trust-note{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:var(--muted);font-size:.86rem;font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:28px}
+.stat{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:16px;padding:16px 12px;text-align:center}
+.stat h3{color:var(--accent);font-size:1.35rem;margin-bottom:4px;font-weight:900}
+.stat p{font-size:.78rem;color:var(--muted);margin:0}
+.hero-visual{display:flex;justify-content:center;align-items:center;position:relative}
+.float-img-wrap{position:relative;animation:float 6s ease-in-out infinite;width:100%;max-width:420px}
+.float-img-glow{position:absolute;inset:8%;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 40%,transparent),color-mix(in srgb,var(--accent2) 28%,transparent));filter:blur(42px);z-index:-1}
+.float-img{width:100%;border-radius:28px;border:1px solid var(--border);box-shadow:var(--shadow);object-fit:cover;aspect-ratio:4/5;display:block}
+section{padding:72px 0}
+.section-head{text-align:center;margin-bottom:36px}
+.section-head h2{font-size:clamp(1.55rem,3vw,2.15rem);margin-bottom:10px;font-weight:900}
+.section-head p{color:var(--muted);max-width:58ch;margin:0 auto}
+.cards,.steps,.membership-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card,.step,.plan{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:24px}
+.benefit .icon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent);font-weight:900;margin-bottom:14px}
+.card h3,.step h3{margin-bottom:8px;font-size:1.06rem;font-weight:800}
+.card p,.step p{color:var(--muted);font-size:.92rem}
+.step .n{width:36px;height:36px;border-radius:12px;background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent);display:grid;place-items:center;font-weight:900;margin-bottom:14px}
+.feature-band{display:grid;grid-template-columns:.9fr 1.1fr;gap:28px;align-items:center}
+.phone-wrap{position:relative;display:flex;justify-content:center}
+.phone-glow{position:absolute;inset:10%;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 35%,transparent),color-mix(in srgb,var(--accent2) 22%,transparent));filter:blur(36px);z-index:-1}
+.phone{width:280px;height:520px;padding:10px;background:#0B1220;border-radius:38px;box-shadow:0 30px 70px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.08);transform:rotate(-2deg)}
+.phone-screen{height:100%;border-radius:30px;overflow:hidden;background:linear-gradient(165deg,var(--phone-tint) 0%,#fff 45%,#f8fafc 100%);color:#0F172A}
+.phone-notch{width:100px;height:24px;background:#0B1220;border-radius:0 0 14px 14px;margin:0 auto 6px}
+.phone-top{padding:8px 16px 6px;display:flex;justify-content:space-between;align-items:center}
+.phone-brand{font-weight:900;font-size:.88rem}
+.phone-dot{width:9px;height:9px;background:var(--accent);border-radius:50%;box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 20%,transparent)}
+.phone-content{padding:8px 16px 18px}
+.phone-label{font-size:11px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:1px}
+.phone-title{font-size:1.4rem;font-weight:900;margin:4px 0 12px}
+.mock-card{background:#fff;padding:12px 14px;border-radius:14px;margin-bottom:8px;box-shadow:0 8px 18px rgba(15,23,42,.06)}
+.mock-row{display:flex;justify-content:space-between;gap:10px;font-size:.86rem}
+.mock-row span{color:#64748B;font-weight:600}
+.mock-button{margin-top:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0B1220;text-align:center;padding:12px;border-radius:12px;font-weight:800;font-size:.9rem}
+.plan{display:flex;flex-direction:column}
+.plan.featured{border-color:color-mix(in srgb,var(--accent) 55%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 25%,transparent),var(--shadow);transform:scale(1.03)}
+.price{font-size:2.1rem;font-weight:900;margin:10px 0 4px}
+.price span{font-size:.9rem;color:var(--muted);font-weight:600}
+.plan ul{list-style:none;margin:16px 0 20px;flex:1}
+.plan li{padding:8px 0;color:var(--muted);font-size:.92rem;border-bottom:1px solid rgba(255,255,255,.04)}
+.plan li strong{color:var(--text)}
+.badge{display:inline-block;background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent);font-size:.7rem;font-weight:800;padding:5px 10px;border-radius:999px;margin-bottom:10px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:24px;padding:26px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field{display:flex;flex-direction:column;gap:7px}
+.field.full{grid-column:1/-1}
+label{font-size:.8rem;font-weight:700;color:var(--muted)}
+input,select,textarea{background:var(--panel2);border:1px solid var(--border);border-radius:12px;color:var(--text);padding:12px 13px;font:inherit}
+textarea{min-height:96px;resize:vertical}
+.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.tab{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:700;font-family:inherit;font-size:.9rem;transition:background .15s,color .15s,border-color .15s}
+.tab:hover{color:var(--text);border-color:rgba(255,255,255,.25)}
+.tab.active{background:color-mix(in srgb,var(--accent) 22%,transparent);border-color:color-mix(in srgb,var(--accent) 55%,transparent);color:var(--text);box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 25%,transparent)}
+.tab.active{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--text);border-color:color-mix(in srgb,var(--accent) 40%,transparent)}
+.muted{color:var(--muted)}.success{color:#4ADE80}.error{color:#FB7185}
+.usage{margin:12px 0 0;font-size:.9rem;color:var(--muted)}
+.usage-bar{height:8px;background:#1A2332;border-radius:99px;overflow:hidden;margin-top:8px}
+.usage-bar span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%}
+.report{background:var(--panel2);border:1px solid var(--border);border-radius:18px;padding:20px;margin-top:18px}
+.report ul{margin:10px 0 0 18px;color:var(--muted)}
+.score{display:inline-flex;gap:8px;background:color-mix(in srgb,var(--accent) 14%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);padding:8px 14px;border-radius:999px;font-weight:800;margin:12px 0}
+.history-item{border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px}
+.faq details{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:10px}
+.faq summary{cursor:pointer;font-weight:700}
+.faq p{color:var(--muted);margin-top:10px;font-size:.92rem}
+.testimonial .stars{color:var(--accent);letter-spacing:2px;margin-bottom:10px;font-size:.85rem}
+.testimonial p{font-size:.95rem;font-style:italic;margin-bottom:14px}
+.testimonial .t-meta{font-size:.85rem;display:flex;gap:6px;color:var(--muted)}
+.testimonial .t-meta strong{color:var(--text)}
+footer{border-top:1px solid var(--border);padding:28px 0;color:var(--muted);font-size:.88rem}
+.footer-row{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.pay-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px}
+.note{font-size:.85rem;color:var(--muted);margin-top:12px}
+.locked{background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 28%,transparent);border-radius:12px;padding:12px 14px;font-size:.9rem;margin-top:12px}
+.recur{display:inline-block;background:rgba(74,222,128,.12);color:#4ADE80;border:1px solid rgba(74,222,128,.25);font-size:.7rem;font-weight:800;padding:4px 10px;border-radius:999px;margin-left:8px;vertical-align:middle}
+@media(max-width:960px){.hero,.feature-band,.cards,.steps,.membership-grid,.form-grid{grid-template-columns:1fr}.plan.featured{transform:none}.nav-links{display:none}.phone{width:260px;height:480px;transform:none}}
 
+/* AUTH TABS — force clickable */
+#authTabs,.tabs{position:relative;z-index:5;display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+#authTabs .tab,.tab{
+  position:relative;z-index:6;
+  pointer-events:auto !important;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.18);
+  color:#94A3B8;
+  padding:10px 16px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:700;
+  font-family:inherit;
+  font-size:.9rem;
+}
+#authTabs .tab:hover,.tab:hover{color:#F1F5F9;border-color:rgba(255,255,255,.35)}
+#authTabs .tab.active,.tab.active{
+  background:rgba(34,211,238,.2);
+  border-color:rgba(34,211,238,.65);
+  color:#F1F5F9;
+  box-shadow:0 0 0 1px rgba(34,211,238,.3);
+}
+#account .panel{position:relative;z-index:2;overflow:visible}
+
+#account{scroll-margin-top:90px}
+
+/* Professional polish */
+html{scroll-behavior:smooth}
+body{letter-spacing:0.01em}
+.panel{box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.section-head h2{letter-spacing:-0.02em}
+.btn{letter-spacing:0.02em}
+.btn-primary{box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.btn-primary:hover{filter:brightness(1.06)}
+.note{border-radius:10px;padding:10px 12px}
+.note.success{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.35);color:#BBF7D0}
+.note.error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);color:#FECACA}
+#authMessage:empty,#outreachMsg:empty,#matchedProvidersMsg:empty,#callProvidersMsg:empty{display:none}
+#authMessage:not(:empty),#outreachMsg:not(:empty){display:block;margin-top:10px}
+.report{line-height:1.55}
+.report h4{margin:0 0 8px;font-size:1.15rem}
+.report .score{font-size:1.35rem;font-weight:800;margin:8px 0 12px}
+.history-item{transition:border-color .15s}
+.history-item:hover{border-color:rgba(255,255,255,.22)}
+footer{opacity:.9}
+
+</style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <nav>
+      <a class="logo" href="#top">StudyMatch <span>AI</span></a>
+      <div class="nav-links">
+        <a href="#benefits">Benefits</a>
+        <a href="#how">How it works</a>
+        <a href="#membership">Membership</a>
+        <a href="#workspace">Tutor brief</a>
+        <a href="#testimonials">Stories</a>
+        <a href="#account">Account</a>
+        <a href="#faq">FAQ</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <a class="btn btn-primary btn-sm" href="#workspace">Build my tutor brief</a>
+    </nav>
+  </div>
+</header>
+<main id="top">
+  <section class="hero-section">
+    <div class="container hero">
+      <div>
+        <div class="eyebrow">Tutoring · built for ongoing use</div>
+        <h1>Compare tutors before buying a package. <span>Come back when it matters.</span></h1>
+        <p class="lead">Subject, level and trial questions — so tutoring fits the learner.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#workspace">Build my tutor brief</a>
+          <a class="btn btn-secondary" href="#membership">View plans</a>
+        </div>
+        <div class="trust-note"><span>✓ <strong>Free plan included</strong></span><span>·</span><span>You choose who to contact</span><span>·</span><span>PayPal checkout</span></div>
+        <div class="stats">
+          <div class="stat"><h3>3</h3><p>Free packs / month</p></div>
+          <div class="stat"><h3>∞</h3><p>Pro unlimited</p></div>
+          <div class="stat"><h3>↻</h3><p>Repeat use</p></div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="float-img-wrap">
+          <div class="float-img-glow"></div>
+          <div class="niche-graphic float-img" style="min-height:320px;aspect-ratio:4/5;border-radius:28px;border:1px solid var(--border);box-shadow:var(--shadow);background:linear-gradient(145deg,#2563EB,#60A5FA 50%,#0B1220);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-size:4.5rem">📚<div style="font-size:1rem;font-weight:800;color:#fff">Study</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="benefits">
+    <div class="container">
+      <div class="section-head">
+        <h2>Why people use StudyMatch <span class="recur">RECURRING</span></h2>
+        <p>Designed for decisions that come back.</p>
+      </div>
+      <div class="cards"><div class="card benefit"><div class="icon">✦</div><h3>Subject and level clear</h3><p>Before packages.</p></div>
+<div class="card benefit"><div class="icon">◎</div><h3>Trial standard</h3><p>Same questions every tutor.</p></div>
+<div class="card benefit"><div class="icon">◇</div><h3>Term after term</h3><p>Reuse as subjects change.</p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container feature-band">
+      <div class="phone-wrap">
+        <div class="phone-glow"></div>
+        <div class="phone"><div class="phone-screen">
+          <div class="phone-notch"></div>
+          <div class="phone-top"><div class="phone-brand">StudyMatch AI</div><div class="phone-dot"></div></div>
+          <div class="phone-content">
+            <div class="phone-label">Tutor pack</div>
+            <div class="phone-title">Focus 69</div>
+            <div class="mock-card"><div class="mock-row"><strong>Subject</strong><span>Maths</span></div></div>
+<div class="mock-card"><div class="mock-row"><strong>Level</strong><span>Grade 11</span></div></div>
+<div class="mock-card"><div class="mock-row"><strong>Next</strong><span>Trial questions</span></div></div>
+            <div class="mock-button">View full brief</div>
+          </div>
+        </div></div>
+      </div>
+      <div class="panel">
+        <div class="eyebrow">On your phone</div>
+        <h2 style="font-size:1.6rem;margin-bottom:12px;font-weight:900">Pack flow that fits a mobile screen</h2>
+        <p class="muted" style="margin-bottom:14px">Generate a readiness-style score, checklist and provider brief — then contact who you choose.</p>
+        <ul style="color:var(--muted);margin-left:18px;font-size:.92rem">
+          <li style="margin:8px 0">Free plan to try the flow</li>
+          <li style="margin:8px 0">Pro when you need more packs</li>
+          <li style="margin:8px 0">Same structure every time you return</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="container">
+      <div class="section-head"><h2>How it works</h2><p>Intake → qualify → compare.</p></div>
+      <div class="steps"><div class="step"><div class="n">1</div><h3>Describe the learning need</h3><p>Subject, level, goals.</p></div>
+<div class="step"><div class="n">2</div><h3>Get your pack</h3><p>Focus score and questions.</p></div>
+<div class="step"><div class="n">3</div><h3>Compare tutors</h3><p>Trial first.</p></div></div>
+    </div>
+  </section>
+
+  <section id="membership">
+    <div class="container">
+      <div class="section-head"><h2>Membership</h2><p>Start free. Upgrade when you need more packs.</p></div>
+      <div class="membership-grid">
+        <div class="plan">
+          <h3>Free</h3>
+          <div class="price">R0 <span>/ month</span></div>
+          <p class="muted">Try the flow</p>
+          <ul><li><strong>3 packs</strong> / month</li><li>Core score + brief</li><li>Latest 3 in history</li></ul>
+          <a class="btn btn-secondary" href="#account">Create free account</a>
+        </div>
+        <div class="plan featured">
+          <div class="badge">MOST POPULAR</div>
+          <h3>Pro</h3>
+          <div class="price">R89 <span>/ month</span></div>
+          <p class="muted">Unlimited packs</p>
+          <ul><li><strong>Unlimited</strong> packs</li><li>Full history</li><li>Full question sets</li></ul>
+          <a class="btn btn-primary" id="payPro" href="#" target="_blank" rel="noopener">Pay for Pro →</a>
+        </div>
+        <div class="plan">
+          <h3>Elite</h3>
+          <div class="price">R179 <span>/ month</span></div>
+          <p class="muted">Power users</p>
+          <ul><li>Everything in Pro</li><li><strong>Elite plays</strong></li><li>Advanced notes</li></ul>
+          <a class="btn btn-secondary" id="payElite" href="#" target="_blank" rel="noopener">Pay for Elite →</a>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:24px">
+        <h3>Payments & entitlement</h3>
+        <p class="muted">After payment, return signed in with the same email to activate. Add PayPal links when ready.</p>
+        <div class="pay-actions">
+          <a class="btn btn-primary" id="payPro2" href="#" target="_blank" rel="noopener">Pay for Pro — R89/mo →</a>
+          <a class="btn btn-secondary" id="payElite2" href="#" target="_blank" rel="noopener">Pay for Elite — R179/mo →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="account">
+    <div class="container">
+      <div class="section-head"><h2>Account</h2><p>Sign in to save packs and unlock Pro/Elite limits.</p></div>
+      <div class="panel">
+        <div class="tabs" id="authTabs" role="tablist" style="position:relative;z-index:5">
+          <button type="button" class="tab active" id="authTabSignin" role="tab" aria-selected="true">Sign in</button>
+          <button type="button" class="tab" id="authTabSignup" role="tab" aria-selected="false">Create account</button>
+        </div>
+        <p id="authModeLabel" class="muted" style="margin:0 0 12px;font-size:.85rem">Mode: <strong id="authModeText">Sign in</strong></p>
+        <form id="authForm" novalidate>
+          <div class="form-grid">
+            <div class="field full"><label for="authEmail">Email</label><input id="authEmail" type="email" required autocomplete="email" placeholder="you@email.com" aria-label="Email"></div>
+            <div class="field full"><label for="authPassword">Password</label><input id="authPassword" type="password" required minlength="8" autocomplete="current-password" placeholder="At least 8 characters" aria-label="Password"></div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-primary" id="authSubmit" type="submit">Sign in</button>
+            <button class="btn btn-ghost" id="authSignOut" type="button" style="display:none">Sign out</button>
+          </div>
+          <p class="note" id="authMessage" role="status" aria-live="polite"></p>
+          <p class="usage" id="planStatus">Not signed in</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section id="workspace">
+    <div class="container">
+      <div class="section-head"><h2>Tutor brief</h2><p>Generate a pack — then contact who you choose.</p></div>
+      <div class="panel">
+        <form id="packForm" onsubmit="return window.__generatePack ? window.__generatePack() : false;">
+          <div class="form-grid">
+            <div class="field"><label for="subject">Subject</label><select id="subject" required><option value="" disabled selected>Select…</option><option value="Maths">Maths</option><option value="Science">Science</option><option value="English">English</option><option value="Languages">Languages</option><option value="Other">Other</option></select></div>
+<div class="field"><label for="level">Level</label><select id="level" required><option value="" disabled selected>Select…</option><option value="Primary">Primary</option><option value="High school">High school</option><option value="Matric">Matric</option><option value="University">University</option><option value="Adult">Adult</option></select></div>
+<div class="field"><label for="format">Format</label><select id="format" required><option value="" disabled selected>Select…</option><option value="In-person">In-person</option><option value="Online">Online</option><option value="Hybrid">Hybrid</option><option value="Not sure">Not sure</option></select></div>
+<div class="field"><label for="goal">Goal</label><select id="goal" required><option value="" disabled selected>Select…</option><option value="Catch up">Catch up</option><option value="Exam prep">Exam prep</option><option value="Confidence">Confidence</option><option value="Enrichment">Enrichment</option></select></div>
+            <div class="field full"><label for="detail">Details</label><textarea id="detail" required placeholder="e.g. Grade 12 maths, exam prep, evenings, prefer online..."></textarea></div>
+            <div class="field full"><label for="notes">Extra notes (optional)</label><textarea id="notes" placeholder="Anything else to include..."></textarea></div>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <button type="button" id="packBtn" class="btn btn-primary" onclick="return window.__generatePack();">Generate tutor pack</button>
+            <span class="usage" id="usageText"></span>
+          </div>
+          <div class="usage-bar" id="usageBar" style="display:none"><span id="usageFill"></span></div>
+          <div class="locked" id="limitLock" style="display:none">Free limit reached (3 packs this month). Upgrade to Pro for unlimited packs.</div>
+          <div id="resultBox" style="display:none" role="region" aria-live="polite" aria-label="Generated brief"></div>
+
+          
+          <div id="matchedProvidersBox" style="display:none;margin-top:16px;padding:14px;border:1px solid rgba(34,211,238,.25);border-radius:12px;background:rgba(15,20,32,.75)">
+            <strong style="display:block;margin-bottom:6px">Matching providers</strong>
+            <p class="muted" style="font-size:.88rem;margin:0 0 10px">Providers in our network for this niche. Pro/Elite can contact them by email or call.</p>
+            <label for="matchCity" style="display:block;font-size:.72rem;font-weight:700;color:var(--muted,#94A3B8);margin:0 0 6px;text-transform:uppercase;letter-spacing:.04em">City / province (optional filter)</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+              <input id="matchCity" type="text" placeholder="e.g. Gauteng or leave blank for all" style="flex:1;min-width:160px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#121826;color:#F1F5F9;font:inherit;box-sizing:border-box" />
+              <button id="refreshMatchBtn" type="button" class="btn btn-secondary">Refresh list</button>
+            </div>
+            <div id="matchedProvidersList"></div>
+            <p id="matchedProvidersMsg" class="note" style="margin-top:8px;font-size:.85rem" role="status" aria-live="polite"></p>
+          </div>
+
+          <div id="outreachBox" style="display:none;margin-top:16px;padding:14px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(15,20,32,.6)">
+            <strong style="display:block;margin-bottom:6px">Provider outreach</strong>
+            <p class="muted" style="font-size:.88rem;margin:0 0 10px">Send your brief to matching providers. They get your contact details so they can call, WhatsApp or email you back.</p>
+            <div id="outreachPaidControls">
+              
+              <p class="muted" style="font-size:.82rem;margin:0 0 12px;line-height:1.45">We&#8217;ll share your <strong>name, email and phone</strong> with matched providers so they can respond to your brief. Only sent when you click the button below.</p>
+              <label for="outreachName" style="display:block;font-size:.72rem;font-weight:700;color:var(--muted,#94A3B8);margin:0 0 6px;text-transform:uppercase;letter-spacing:.04em">Your name</label>
+              <input id="outreachName" type="text" autocomplete="name" placeholder="e.g. Thabo M." style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#121826;color:#F1F5F9;font:inherit;box-sizing:border-box;margin-bottom:10px" />
+              <label for="outreachPhone" style="display:block;font-size:.72rem;font-weight:700;color:var(--muted,#94A3B8);margin:0 0 6px;text-transform:uppercase;letter-spacing:.04em">Phone / WhatsApp</label>
+              <input id="outreachPhone" type="tel" autocomplete="tel" placeholder="e.g. 082 123 4567" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#121826;color:#F1F5F9;font:inherit;box-sizing:border-box;margin-bottom:10px" />
+              <label for="outreachPrefer" style="display:block;font-size:.72rem;font-weight:700;color:var(--muted,#94A3B8);margin:0 0 6px;text-transform:uppercase;letter-spacing:.04em">Preferred contact</label>
+              <select id="outreachPrefer" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#121826;color:#F1F5F9;font:inherit;box-sizing:border-box;margin-bottom:10px">
+                <option value="WhatsApp">WhatsApp</option>
+                <option value="Call">Phone call</option>
+                <option value="Email">Email</option>
+                <option value="Any">Any</option>
+              </select>
+<label for="outreachCity" style="display:block;font-size:.72rem;font-weight:700;margin:0 0 6px">City / area</label>
+              <input id="outreachCity" type="text" placeholder="e.g. Johannesburg" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#121826;color:#fff;box-sizing:border-box" />
+              <button id="outreachBtn" type="button" class="btn btn-primary" style="margin-top:10px;width:100%">Contact providers for me</button>
+              <p id="outreachMsg" class="note" style="margin-top:8px;font-size:.85rem"></p>
+            </div>
+            <div id="outreachFreeLock" style="display:none">
+              <p class="note">Included with Pro and Elite.</p>
+              <a class="btn btn-primary" href="#membership">View Pro &amp; Elite</a>
+            </div>
+          </div>
+
+          <div id="callProvidersBox" style="display:none;margin-top:16px;padding:14px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(15,20,32,.6)">
+            <strong style="display:block;margin-bottom:6px">Call or WhatsApp providers</strong>
+            <p class="muted" style="font-size:.88rem;margin:0 0 10px">Tap to open your dialler or WhatsApp. You choose who to contact. Pro/Elite.</p>
+            <label for="callCity" style="display:block;font-size:.72rem;font-weight:700;color:var(--muted,#94A3B8);margin:0 0 6px;text-transform:uppercase;letter-spacing:.04em">City / province</label>
+            <input id="callCity" type="text" placeholder="e.g. Johannesburg or Gauteng" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#121826;color:#F1F5F9;font:inherit;box-sizing:border-box;margin-bottom:8px" />
+            <button id="loadCallProvidersBtn" type="button" class="btn btn-secondary" style="width:100%;margin-bottom:10px">Show providers to call</button>
+            <div id="callProvidersList"></div>
+            <p id="callProvidersMsg" class="note" style="margin-top:8px;font-size:.85rem"></p>
+          </div>
+
+
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section id="history">
+    <div class="container">
+      <div class="section-head"><h2>Pack history</h2><p>Free keeps latest 3. Pro/Elite keep full history.</p></div>
+      <div class="panel"><div id="historyList"><p class="muted">Sign in and generate a pack to see history.</p></div></div>
+    </div>
+  </section>
+
+  <section id="testimonials">
+    <div class="container">
+      <div class="section-head"><h2>What people say</h2></div>
+      <div class="cards"><div class="card testimonial"><div class="stars">★★★★★</div><p>“Trial questions were consistent.”</p><div class="t-meta"><strong>Parent · Nomsa</strong><span>Soweto</span></div></div>
+<div class="card testimonial"><div class="stars">★★★★★</div><p>“Rates and format clearer.”</p><div class="t-meta"><strong>Parent · Ravi</strong><span>Durban</span></div></div>
+<div class="card testimonial"><div class="stars">★★★★★</div><p>“Exam focus helped.”</p><div class="t-meta"><strong>Student · Kai</strong><span>Cape Town</span></div></div></div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="container">
+      <div class="section-head"><h2>FAQ</h2></div>
+      <div class="faq"><details open><summary>Is this a tutoring company?</summary><p>No. StudyMatch helps you compare tutors.</p></details>
+<details><summary>Do you teach?</summary><p>No.</p></details>
+<details><summary>Reusable each term?</summary><p>Yes.</p></details>
+<details><summary>Free?</summary><p>Limited free packs.</p></details></div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="container">
+      <div class="section-head"><h2>Contact &amp; feedback</h2></div>
+      <div class="panel" style="text-align:center;max-width:640px;margin:0 auto">
+        <a class="btn btn-primary" href="https://forms.gle/Ggm7sGfq3hkzV1D39" target="_blank" rel="noopener">Open contact / feedback form →</a>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="container footer-row">
+    <div>© 2026 StudyMatch AI · Tutoring</div>
+    <div>Free plan included</div>
+  </div>
+</footer>
+<script>
+(function(){
+  function val(id){ var e=document.getElementById(id); return e ? (e.value || '') : ''; }
+  function allSelects(){
+    var form=document.getElementById('packForm');
+    var out={};
+    if(!form) return out;
+    var list=form.querySelectorAll('select');
+    for(var i=0;i<list.length;i++){ out[list[i].id]=list[i].value||''; }
+    return out;
+  }
+  function checkRequired(){
+    var form=document.getElementById('packForm');
+    if(!form) return 'Form missing — hard refresh the page.';
+    var list=form.querySelectorAll('select[required]');
+    for(var i=0;i<list.length;i++){
+      if(!list[i].value){
+        var lab=list[i].id;
+        try{ if(list[i].labels && list[i].labels[0]) lab=list[i].labels[0].textContent; }catch(e){}
+        list[i].focus();
+        return 'Please choose an option for: ' + lab;
+      }
+    }
+    return '';
+  }
+  function simplePack(vals){
+    var lines=[], k;
+    for(k in vals){ if(vals.hasOwnProperty(k) && vals[k]) lines.push(k + ': ' + vals[k]); }
+    var detail=vals.detail||'';
+    var notes=vals.notes||'';
+    var score=50;
+    if(/urgent|emergency|asap|leak|flood/i.test(detail+' '+notes)) score+=15;
+    if(detail.length>40) score+=10;
+    if(score>100) score=100;
+    var html='<div class="report"><h4>Your pack is ready</h4>';
+    html+='<div class="score">Score: '+score+' / 100</div>';
+    html+='<p><strong>Your answers</strong></p><ul>';
+    for(var i=0;i<lines.length;i++){ html+='<li>'+lines[i].replace(/</g,'&lt;')+'</li>'; }
+    html+='</ul>';
+    if(detail) html+='<p style="margin-top:12px"><strong>Detail</strong><br>'+String(detail).replace(/</g,'&lt;').replace(/\\n/g,'<br>')+'</p>';
+    if(notes) html+='<p style="margin-top:8px"><strong>Notes</strong><br>'+String(notes).replace(/</g,'&lt;')+'</p>';
+    html+='<p style="margin-top:12px"><strong>Next steps</strong></p><ul>';
+    html+='<li>Review matching providers below (sign in if the list is empty).</li>';
+    html+='<li>Use Call / WhatsApp on a provider card, or Contact providers for email outreach (Pro/Elite).</li>';
+    html+='<li>Send the same brief to 2+ providers and compare written replies.</li>';
+    html+='</ul></div>';
+    return {html:html, title:'Pack '+score, when:new Date().toLocaleString(), score:score};
+  }
+  window.__generatePack = function(){
+    try{
+      var err=checkRequired();
+      if(err){ alert(err); return false; }
+      var vals=allSelects();
+      vals.detail=val('detail');
+      vals.notes=val('notes');
+      var btn=document.getElementById('packBtn');
+      var prev=btn?btn.textContent:'Generate';
+      if(btn){ btn.disabled=true; btn.textContent='Generating…'; }
+      var pack;
+      if(typeof buildPack === 'function'){
+        try { pack = buildPack(vals); }
+        catch(e1){ console.warn(e1); pack = simplePack(vals); }
+      } else {
+        pack = simplePack(vals);
+      }
+      if(!pack || !pack.html) pack = simplePack(vals);
+      var rb=document.getElementById('resultBox');
+      if(!rb){
+        rb=document.createElement('div');
+        rb.id='resultBox';
+        rb.style.cssText='display:block;margin-top:16px;padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(15,20,32,.8)';
+        var form=document.getElementById('packForm');
+        if(form) form.appendChild(rb);
+        else document.body.appendChild(rb);
+      }
+      rb.style.display='block';
+      rb.innerHTML=pack.html;
+      window.__lastBriefText = rb.innerText || pack.title || '';
+      // show provider panels if present
+      function show(id){ var el=document.getElementById(id); if(el) el.style.display='block'; }
+      show('matchedProvidersBox');
+      show('outreachBox');
+      show('callProvidersBox');
+      try{
+        if(typeof showProviderPanelsAfterPack === 'function') showProviderPanelsAfterPack();
+        else if(typeof renderMatchedProviders === 'function') renderMatchedProviders('');
+      }catch(e2){ console.warn(e2); }
+      try{ rb.scrollIntoView({behavior:'smooth', block:'nearest'}); }catch(e3){ try{ rb.scrollIntoView(true);}catch(e4){} }
+      if(btn){ btn.disabled=false; btn.textContent=prev; }
+      return false;
+    }catch(err){
+      console.error(err);
+      alert('Generate error: ' + (err && err.message ? err.message : err));
+      var b=document.getElementById('packBtn');
+      if(b){ b.disabled=false; }
+      return false;
+    }
+  };
+  // Bind as soon as DOM is ready
+  function bind(){
+    var form=document.getElementById('packForm');
+    var btn=document.getElementById('packBtn');
+    if(form){
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        window.__generatePack();
+        return false;
+      });
+    }
+    if(btn){
+      btn.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        window.__generatePack();
+        return false;
+      });
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', bind);
+  } else {
+    bind();
+  }
+})();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SB_URL="https://omiynmichresemvmhtwu.supabase.co";
+const SB_KEY="sb_publishable_RmG-NaWz5A0d-yyjxgvc_Q_hKzcn2LN";
+const AGENT="tutormatch";
+
+const OUTREACH_URL="https://omiynmichresemvmhtwu.supabase.co/functions/v1/send-outreach";
+
+function normalizePhone(p){
+  let s=String(p||'').replace(/[^\d+]/g,'');
+  if(s.startsWith('00')) s='+'+s.slice(2);
+  if(/^0\d{9}$/.test(s)) s='+27'+s.slice(1);
+  return s;
+}
+function providerCard(p, paid){
+  const name=escapeHtml(p.company||p.name||'Provider');
+  const city=escapeHtml(p.city||'');
+  const phone=normalizePhone(p.phone||p.whatsapp||'');
+  const wa=normalizePhone(p.whatsapp||p.phone||'');
+  let actions='';
+  if(paid && phone){
+    actions += '<a class="btn btn-secondary btn-sm" style="margin:4px 6px 4px 0;display:inline-block" href="tel:'+escapeHtml(phone)+'">Call</a>';
+  }
+  if(paid && wa){
+    const waNum=wa.replace(/\D/g,'');
+    actions += '<a class="btn btn-secondary btn-sm" style="margin:4px 6px 4px 0;display:inline-block" href="https://wa.me/'+waNum+'" target="_blank" rel="noopener noreferrer">WhatsApp</a>';
+  }
+  if(!paid){
+    actions = '<span class="muted" style="font-size:.8rem">Sign in with Pro to call or email providers</span>';
+  }
+  return '<div class="history-item" style="margin-bottom:10px;padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:10px"><strong>'+name+'</strong><div class="muted" style="font-size:.85rem;margin:4px 0">'+(city?city+' · ':'')+(p.email?escapeHtml(p.email):'No email on file')+'</div>'+actions+'</div>';
+}
+async function fetchProvidersForAgent(city){
+  if(!client) throw new Error('Supabase not loaded — check internet / CDN');
+  let q = client.from('providers').select('id,name,email,company,phone,whatsapp,city,active').eq('agent', AGENT).eq('active', true).limit(25);
+  const {data, error} = await q;
+  if(error) throw error;
+  let rows = data || [];
+  const cityQ = (city||'').trim();
+  if(cityQ && cityQ.toLowerCase() !== 'all'){
+    const c = cityQ.toLowerCase();
+    const filtered = rows.filter(r=>{
+      const rc = (r.city||'').toLowerCase();
+      return !rc || rc === 'all' || rc.includes(c) || c.includes(rc);
+    });
+    if(filtered.length) rows = filtered;
+  }
+  return rows;
+}
+async function renderMatchedProviders(autoCity){
+  const box = document.getElementById('matchedProvidersBox');
+  const list = document.getElementById('matchedProvidersList');
+  const msg = document.getElementById('matchedProvidersMsg');
+  if(!box || !list) return;
+  box.style.display = 'block';
+  const cityEl = document.getElementById('matchCity');
+  let city = (autoCity != null ? autoCity : (cityEl && cityEl.value) || '').trim();
+  if(cityEl && autoCity != null && !cityEl.value) cityEl.value = autoCity;
+  const oc = document.getElementById('outreachCity');
+  const cc = document.getElementById('callCity');
+  if(oc && city) oc.value = city;
+  if(cc && city) cc.value = city;
+  list.innerHTML = '<p class="muted">Loading providers…</p>';
+  if(msg){ msg.textContent = ''; msg.className = 'note'; }
+  try{
+    if(!currentUser){
+      list.innerHTML = '<p class="muted">Sign in to load matching providers from the network.</p>';
+      if(msg){ msg.textContent = 'Sign in required to load providers.'; msg.className = 'note'; }
+      return;
+    }
+    const paid = currentPlan && (currentPlan.code === 'pro' || currentPlan.code === 'elite');
+    const rows = await fetchProvidersForAgent(city || 'All');
+    if(!rows.length){
+      list.innerHTML = '<p class="muted">No providers found for this niche yet. Try another city, or add providers in Supabase.</p>';
+      if(msg){ msg.textContent = '0 providers matched.'; msg.className = 'note'; }
+      return;
+    }
+    list.innerHTML = rows.map(r => providerCard(r, paid)).join('');
+    if(msg){
+      msg.textContent = rows.length + ' provider(s) found' + (city ? (' near ' + city) : '') + '.' + (paid ? ' You can call or use Contact providers below.' : ' Upgrade to Pro to contact them.');
+      msg.className = 'note success';
+    }
+    const callList = document.getElementById('callProvidersList');
+    if(callList) callList.innerHTML = rows.map(r => providerCard(r, paid)).join('');
+  }catch(err){
+    console.error(err);
+    list.innerHTML = '<p class="muted">Could not load providers: '+escapeHtml(err.message||String(err))+'</p>';
+    if(msg){ msg.textContent = err.message || 'Load failed'; msg.className = 'note error'; }
+  }
+}
+function showProviderPanelsAfterPack(){
+  const paid = currentPlan && (currentPlan.code === 'pro' || currentPlan.code === 'elite');
+  const out = document.getElementById('outreachBox');
+  const call = document.getElementById('callProvidersBox');
+  const match = document.getElementById('matchedProvidersBox');
+  if(match) match.style.display = 'block';
+  if(out) out.style.display = 'block';
+  if(call) call.style.display = 'block';
+  const paidEl = document.getElementById('outreachPaidControls');
+  const freeEl = document.getElementById('outreachFreeLock');
+  if(paidEl) paidEl.style.display = paid ? 'block' : 'none';
+  if(freeEl) freeEl.style.display = paid ? 'none' : 'block';
+  renderMatchedProviders((document.getElementById('matchCity') || {}).value || '');
+}
+
+
+function showCallBoxIfReady(){
+  try{
+    var box = document.getElementById('callProvidersBox');
+    if(!box) return;
+    var hasBrief = !!(window.__lastBriefText && window.__lastBriefText.length > 20);
+    if(!hasBrief){
+      // keep hidden until a pack exists, unless user already opened it
+      return;
+    }
+    box.style.display = 'block';
+    var paid = currentPlan && (currentPlan.code === 'pro' || currentPlan.code === 'elite');
+    var list = document.getElementById('callProvidersList');
+    var msg = document.getElementById('callProvidersMsg');
+    if(!paid && msg){
+      msg.textContent = 'Call and WhatsApp are included with Pro and Elite.';
+      msg.className = 'note';
+    }
+  }catch(e){ console.warn(e); }
+}
+
+function showOutreachIfPaid(){
+  const box=document.getElementById("outreachBox");
+  if(!box)return;
+  const hasBrief=!!(window.__lastBriefText&&window.__lastBriefText.length>20);
+  if(!hasBrief){box.style.display="none";return;}
+  box.style.display="block";
+  const paid=currentPlan&&(currentPlan.code==="pro"||currentPlan.code==="elite");
+  const paidEl=document.getElementById("outreachPaidControls");
+  const freeEl=document.getElementById("outreachFreeLock");
+  if(paidEl)paidEl.style.display=paid?"block":"none";
+  if(freeEl)freeEl.style.display=paid?"none":"block";
+}
+document.getElementById("outreachBtn")?.addEventListener("click",async()=>{
+  const msg=document.getElementById("outreachMsg");
+  if(!msg)return;
+  const city=(document.getElementById("outreachCity")?.value||"All").trim()||"All";
+  const customerName=(document.getElementById("outreachName")?.value||"").trim();
+  const customerPhone=(document.getElementById("outreachPhone")?.value||"").trim();
+  const preferredContact=(document.getElementById("outreachPrefer")?.value||"Any").trim();
+  const briefText=window.__lastBriefText||(document.getElementById("resultBox")?.innerText||"");
+  if(!briefText||briefText.length<40){msg.textContent="Generate your brief first.";msg.className="note error";return;}
+  if(!customerPhone||customerPhone.replace(/\D/g,"").length<9){msg.textContent="Enter a valid phone / WhatsApp number so providers can reach you.";msg.className="note error";return;}
+  msg.textContent="Sending to providers…";msg.className="note";
+  try{
+    const {data:sessionData}=await client.auth.getSession();
+    const token=sessionData.session?.access_token;
+    if(!token){msg.textContent="Sign in with a Pro or Elite account first.";msg.className="note error";return;}
+    const customerEmail=sessionData.session.user.email||"";
+    const res=await fetch(OUTREACH_URL,{
+      method:"POST",
+      headers:{"Content-Type":"application/json",Authorization:"Bearer "+token,apikey:SB_KEY},
+      body:JSON.stringify({
+        agent:AGENT,
+        city:city,
+        brief:briefText,
+        customerName:customerName||customerEmail||"Customer",
+        customerEmail:customerEmail,
+        customerPhone:customerPhone,
+        preferredContact:preferredContact
+      })
+    });
+    const json=await res.json().catch(()=>({}));
+    if(!res.ok)throw new Error(json.error||("Outreach failed ("+res.status+")"));
+    const sent=json.sent||0;const total=json.total||sent;
+    msg.textContent=json.message||("Success: contacted "+sent+(total?(" of "+total):"")+" provider(s). They have your brief and contact details.");
+    msg.className="note success";
+    if(sent===0){msg.textContent=json.message||"No providers could be emailed (check provider emails in Supabase or Resend).";msg.className="note error";}
+  }catch(e){
+    msg.textContent=e.message||"Outreach failed";
+    msg.className="note error";
+  }
+});
+
+const PRO_URL="#";
+const ELITE_URL="#";
+const NAME="StudyMatch";
+function getRedirectUrl(){const c=window.location.href.split('#')[0].split('?')[0];return window.location.protocol==='file:'?'http://localhost:5500/index.html':c}
+let client=null;
+try{
+  if(window.supabase && window.supabase.createClient){
+    client=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  }else{
+    console.warn('Supabase SDK not loaded — pack still works; login/providers need the SDK.');
+  }
+}catch(e){ console.warn('Supabase init failed', e); client=null; }
+
+const PLANS={free:{code:'free',name:'Free',limit:3,history:3,elite:false},pro:{code:'pro',name:'Pro',limit:9999,history:9999,elite:false},elite:{code:'elite',name:'Elite',limit:9999,history:9999,elite:true}};
+let currentUser=null,currentPlan=PLANS.free,authMode='signin',monthUsage=0;
+const $=id=>document.getElementById(id);
+function setAuthMessage(t,e){const el=$('authMessage');if(!el)return;el.textContent=t||'';el.className='note '+(e?'error':'success')}
+function monthKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
+function storageKey(s){return AGENT+'_'+(currentUser?.id||'anon')+'_'+s}
+function loadLocalUsage(){try{monthUsage=Number(localStorage.getItem(storageKey('usage_'+monthKey()))||0)||0}catch{monthUsage=0}}
+function saveLocalUsage(){try{localStorage.setItem(storageKey('usage_'+monthKey()),String(monthUsage))}catch{}}
+function loadLocalHistory(){try{return JSON.parse(localStorage.getItem(storageKey('history'))||'[]')}catch{return[]}}
+function saveLocalHistory(items){try{localStorage.setItem(storageKey('history'),JSON.stringify(items.slice(0,currentPlan.history)))}catch{}}
+async function loadPlanFromSupabase(){
+  if(!client){currentPlan=PLANS.free;return}
+  if(!currentUser){currentPlan=PLANS.free;return}
+  try{
+    const {data,error}=await client.from('subscriptions').select('plan_code,status').eq('user_id',currentUser.id).maybeSingle();
+    if(!error&&data) currentPlan=PLANS[(data.plan_code||'free').toLowerCase()]||PLANS.free; else currentPlan=PLANS.free;
+  }catch{currentPlan=PLANS.free}
+}
+function updatePlanUI(){
+  const used=monthUsage,limit=currentPlan.limit;
+  $('planStatus').textContent=currentUser?('Signed in as '+currentUser.email+' · '+currentPlan.name+(currentPlan.code==='free'?' · '+used+'/'+limit+' packs':' · Unlimited')):'Not signed in';
+  $('usageText').textContent=currentPlan.code==='free'?(used+' of '+limit+' free packs used this month'):(currentPlan.name+' · unlimited');
+  if(currentPlan.code==='free'){$('usageBar').style.display='block';$('usageFill').style.width=Math.min(100,(used/limit)*100)+'%'}else $('usageBar').style.display='none';
+  $('limitLock').style.display=(currentPlan.code==='free'&&used>=limit)?'block':'none';
+  $('packBtn').disabled=(currentPlan.code==='free'&&used>=limit);
+
+  if(typeof showCallBoxIfReady==='function'){showCallBoxIfReady();}
+}
+function escapeHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function renderHistory(){
+  const items=loadLocalHistory(),list=$('historyList');
+  if(!items.length){list.innerHTML='<p class="muted">No saved packs yet.</p>';return}
+  list.innerHTML=items.map(i=>'<div class="history-item"><strong>'+escapeHtml(i.title)+'</strong><span class="muted"> · '+escapeHtml(i.when)+' · score '+escapeHtml(i.score)+'</span></div>').join('');
+}
+function scoreInput(vals){
+  let s=40;
+  const joined=Object.values(vals).join(' ').toLowerCase();
+  if(/weekly|monthly|repeat|chronic|renew|upgrade|switching|asap|emergency|urgent/.test(joined)) s+=18;
+  if(/this month|this week|full day|heavy/.test(joined)) s+=10;
+  return Math.max(20, Math.min(96, s));
+}
+function readinessLabel(score){
+  if(score>=80) return 'STRONG — ready to compare options with a clear brief';
+  if(score>=55) return 'PROMISING — shortlist 2 options and tighten details';
+  if(score>=35) return 'DEVELOPING — clarify priorities';
+  return 'EARLY — research phase';
+}
+function buildPack(vals){
+  const score=scoreInput(vals);
+  const detail=(vals.detail||'').trim();
+  const notes=(vals.notes||'').trim();
+  const qualify=Object.entries(vals).filter(([k])=>k!=='detail'&&k!=='notes').map(([k,v])=>k+': '+v);
+  qualify.push('Detail: '+detail.slice(0,220)+(detail.length>220?'…':''));
+  const checklist=['Write success criteria in one sentence','Ask the same must-ask questions to every option','Prefer written scope before paying deposits','Save this pack and re-run when needs change'];
+  const mustAsk=['What is included vs extra fees?','How do changes, pauses or cancellations work?','What is the timeline / response promise?','Any lock-in period or exit fees?','What should I prepare before we start?','How do we review after 30 days?'];
+  const actions=['Send this brief to 2 options and compare written replies','Calendar a follow-up if needed','Avoid long commitments until scope is clear'];
+  const elite=['Only continue if inclusions are written','Annualise monthly fees before comparing','After 30 days, score reliability and support'];
+  let html='<div class="report"><h4>'+NAME+' pack</h4><div class="score">Score: '+score+' / 100</div>';
+  html+='<p><strong>Band:</strong> '+readinessLabel(score)+'</p>';
+  html+='<p style="margin-top:12px"><strong>Snapshot</strong></p><ul>'+qualify.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+  html+='<p style="margin-top:12px"><strong>Checklist</strong></p><ul>'+checklist.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+  html+='<p style="margin-top:12px"><strong>Must-ask questions</strong></p><ul>'+mustAsk.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+  html+='<p style="margin-top:12px"><strong>Next actions</strong></p><ul>'+actions.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+  if(notes) html+='<p class="muted" style="margin-top:10px">Notes: '+notes+'</p>';
+  if(currentPlan.elite) html+='<p style="margin-top:12px"><strong>Elite plays</strong></p><ul>'+elite.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+  else html+='<p class="note">Upgrade to Elite for advanced decision plays.</p>';
+  html+='<p class="note">Planning aid only — not professional, medical or financial advice.</p></div>';
+  return {title:NAME+' · score '+score, when:new Date().toLocaleString(), score, html};
+}
+async function canGenerate(){
+  try{
+    if(!currentUser){
+      return true;
+    }
+    await loadPlanFromSupabase();
+    loadLocalUsage();
+    updatePlanUI();
+    if(currentPlan.code==='free' && monthUsage>=currentPlan.limit){
+      const lock=$('limitLock');
+      if(lock) lock.style.display='block';
+      setAuthMessage('Free limit reached this month. Upgrade to Pro for unlimited packs.', true);
+      return false;
+    }
+    return true;
+  }catch(err){
+    console.error(err);
+    return true;
+  }
+}
+async function refreshSession(){
+  const {data}=await client.auth.getSession();currentUser=data.session?.user||null;
+  $('authSignOut').style.display=currentUser?'inline-flex':'none';
+  $('authSubmit').textContent=authMode==='signup'?'Create account':(currentUser?'Signed in':'Sign in');
+  await loadPlanFromSupabase();loadLocalUsage();updatePlanUI();renderHistory();
+}
+
+
+
+document.getElementById('refreshMatchBtn')?.addEventListener('click',()=>renderMatchedProviders());
+document.getElementById('loadCallProvidersBtn')?.addEventListener('click',()=>{
+  const city=(document.getElementById('callCity')?.value||'').trim();
+  const mc=document.getElementById('matchCity');
+  if(mc) mc.value=city;
+  renderMatchedProviders(city);
+  const callBox=document.getElementById('callProvidersBox');
+  if(callBox) callBox.style.display='block';
+});
+
+function setAuthMode(mode){
+  authMode = (mode === 'signup') ? 'signup' : 'signin';
+  var tabIn = document.getElementById('authTabSignin');
+  var tabUp = document.getElementById('authTabSignup');
+  var submit = document.getElementById('authSubmit');
+  var modeText = document.getElementById('authModeText');
+  var pass = document.getElementById('authPassword');
+  if(tabIn){
+    tabIn.classList.toggle('active', authMode === 'signin');
+    tabIn.setAttribute('aria-selected', authMode === 'signin' ? 'true' : 'false');
+  }
+  if(tabUp){
+    tabUp.classList.toggle('active', authMode === 'signup');
+    tabUp.setAttribute('aria-selected', authMode === 'signup' ? 'true' : 'false');
+  }
+  if(submit){
+    submit.disabled = false;
+    submit.textContent = authMode === 'signup' ? 'Create account' : 'Sign in';
+  }
+  if(modeText) modeText.textContent = authMode === 'signup' ? 'Create account' : 'Sign in';
+  if(pass) pass.setAttribute('autocomplete', authMode === 'signup' ? 'new-password' : 'current-password');
+  try{ setAuthMessage(''); }catch(_e){}
+}
+(function bindAuthTabs(){
+  var tabIn = document.getElementById('authTabSignin');
+  var tabUp = document.getElementById('authTabSignup');
+  if(tabIn){
+    tabIn.onclick = function(e){
+      if(e){ e.preventDefault(); e.stopPropagation(); }
+      setAuthMode('signin');
+      return false;
+    };
+  }
+  if(tabUp){
+    tabUp.onclick = function(e){
+      if(e){ e.preventDefault(); e.stopPropagation(); }
+      setAuthMode('signup');
+      return false;
+    };
+  }
+})();
+
+$('authForm').addEventListener('submit',async e=>{e.preventDefault();e.stopPropagation();const email=$('authEmail').value.trim(),password=$('authPassword').value;
+  if(!email||!password){setAuthMessage('Enter email and password.',true);return;}
+  if(password.length<8){setAuthMessage('Password must be at least 8 characters.',true);return;}
+
+  setAuthMessage(authMode==='signup'?'Creating account...':'Signing in...');
+  try{
+    if(authMode==='signup'){const {data,error}=await client.auth.signUp({email,password,options:{emailRedirectTo:getRedirectUrl()}});if(error)throw error;setAuthMessage(data.user&&!data.session?'Check your email to confirm.':'Account created.')}
+    else{const {error}=await client.auth.signInWithPassword({email,password});if(error)throw error;setAuthMessage('Signed in.')}
+    await refreshSession();
+  }catch(err){setAuthMessage(err.message||'Auth failed',true)}
+});
+$('authSignOut').addEventListener('click',async()=>{await client.auth.signOut();currentUser=null;currentPlan=PLANS.free;setAuthMessage('Signed out.');await refreshSession()});
+$('packForm').addEventListener('submit', function(e){ e.preventDefault(); e.stopPropagation(); window.__generatePack(); });
+async function tryAutoActivate(){
+  // SECURITY: never trust ?paid= from the URL to write subscriptions.
+  // Real activation must come from PayPal webhook / manual admin / server only.
+  const params=new URLSearchParams(window.location.search);
+  let paid=(params.get('paid')||'').toLowerCase();
+  if(paid!=='pro'&&paid!=='elite') return;
+  const {data}=await client.auth.getSession();
+  const user=data.session?.user;
+  if(!user){
+    setAuthMessage('If you paid, sign in with the same email you used at checkout. Your plan activates after payment is confirmed.');
+    return;
+  }
+  setAuthMessage('If you just paid, your '+paid.toUpperCase()+' plan will show here once payment is confirmed. This page cannot unlock Pro by itself.');
+  // Strip paid param from URL so it is not bookmarked as a "free upgrade" link
+  try{
+    params.delete('paid');
+    const q=params.toString();
+    const clean=window.location.pathname+(q?'?'+q:'')+window.location.hash;
+    window.history.replaceState({},'',clean);
+  }catch(_){}
+}
+client.auth.onAuthStateChange(async()=>{await refreshSession()});
+refreshSession();tryAutoActivate();
+</script>
+</body>
+</html>
